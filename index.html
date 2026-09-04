@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>여름! 바다! 배구!</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,.55) 0 4%, transparent 4.5%),
+      radial-gradient(circle at 82% 15%, rgba(255,255,255,.4) 0 3%, transparent 3.5%),
+      linear-gradient(160deg, #8fdcff 0%, #bcecff 40%, #ffc1d8 100%);
+    color: #fff;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap {
+    width: min(100%, 1000px);
+    padding: 20px;
+    text-align: center;
+  }
+  h1 {
+    margin: 0 0 6px;
+    font-size: clamp(28px, 5vw, 44px);
+    letter-spacing: 2px;
+    color: #fff8fc;
+  }
+  .help { margin: 0 0 16px; color: #d6deea; }
+  .panel {
+    max-width: 620px; margin: 0 auto 16px; padding: 22px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(157,225,255,.78), rgba(255,190,215,.72));
+    border: 4px solid rgba(255,255,255,.85);
+    box-shadow: 6px 6px 0 rgba(244,143,177,.35), -4px -4px 0 rgba(115,207,245,.18);
+  }
+  .panel h2 { margin: 0 0 8px; }
+  .panel p { color: #d6deea; }
+  .uploads, .modes { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+  .file-label {
+    padding: 10px; border-radius: 12px; background: rgba(255,255,255,.08);
+    font-size: 14px;
+  }
+  input[type=file] { display: block; max-width: 240px; margin-top: 8px; }
+  button {
+    border: 3px solid #fff;
+    border-radius: 8px;
+    padding: 14px 24px;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    color: #4c6680;
+    background: linear-gradient(135deg, #b5ebff, #ffc1d8);
+    box-shadow: 4px 4px 0 #ef8eb5;
+    transition: transform .1s, box-shadow .1s;
+  }
+  button:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #ef8eb5; }
+  button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #ef8eb5; }
+  .modes button { min-width: 190px; }
+  .difficulty-box {
+    margin: 16px auto;
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.18);
+    border: 2px solid rgba(255,255,255,.5);
+  }
+  .difficulty-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+  .difficulty {
+    padding: 9px 14px;
+    font-size: 14px;
+    box-shadow: 2px 2px 0 #4baecb;
+    opacity: .72;
+  }
+  .difficulty.selected {
+    opacity: 1;
+    outline: 3px solid #fff;
+    transform: translate(-1px, -1px);
+  }
+  #difficultyHint {
+    display: block;
+    color: #176783;
+    font-weight: 700;
+  }
+  .hint { color: #cbd5e1; font-size: 13px; line-height: 1.6; }
+  .mobile-controls {
+    display: none;
+    width: 100%;
+    gap: 12px;
+    margin-top: 14px;
+    justify-content: center;
+  }
+  .mobile-player {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 8px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.22);
+    border: 2px solid rgba(255,255,255,.65);
+  }
+  .mobile-label {
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #176783;
+  }
+  .control-row {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+  }
+  .touch-btn {
+    width: 58px;
+    height: 58px;
+    min-width: 0;
+    padding: 0;
+    border-radius: 14px;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    font-size: 24px;
+    line-height: 1;
+    box-shadow: 3px 3px 0 #4baecb;
+  }
+  .jump-btn {
+    background: #ef8fb5;
+    font-size: 20px;
+  }
+  .jump-btn span {
+    display: block;
+    font-size: 8px;
+    margin-top: 2px;
+  }
+
+  /* =========================
+     📱 모바일 세로 모드 최적화
+     ========================= */
+  @media (max-width: 700px), (pointer: coarse) {
+    body {
+      min-height: 100dvh;
+      display: block;
+      overscroll-behavior: none;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: none;
+      min-height: 100dvh;
+      padding: max(8px, env(safe-area-inset-top))
+               max(6px, env(safe-area-inset-right))
+               max(10px, env(safe-area-inset-bottom))
+               max(6px, env(safe-area-inset-left));
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    h1 {
+      font-size: clamp(22px, 7vw, 32px);
+      line-height: 1.1;
+      margin: 4px 0 5px;
+    }
+
+    .help {
+      margin: 0 0 8px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    /* 게임 화면을 모바일 가로폭 전체에 가깝게 표시 */
+    canvas {
+      width: 100vw;
+      max-width: 100vw;
+      margin-left: calc(50% - 50vw);
+      border-width: 3px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .mobile-controls {
+      display: flex;
+      width: 100%;
+      gap: 8px;
+      margin-top: 8px;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .mobile-player {
+      flex: 1;
+      padding: 7px 4px 8px;
+      border-radius: 14px;
+    }
+
+    .mobile-label {
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .control-row {
+      gap: clamp(5px, 2vw, 10px);
+    }
+
+    /* 방향키는 적당하게 */
+    .touch-btn {
+      width: clamp(50px, 15vw, 68px);
+      height: clamp(54px, 16vw, 72px);
+      font-size: clamp(21px, 6vw, 29px);
+      border-radius: 16px;
+      border-width: 3px;
+    }
+
+    /* 점프 버튼은 확실히 크게! */
+    .jump-btn {
+      width: clamp(72px, 22vw, 105px);
+      height: clamp(64px, 19vw, 88px);
+      font-size: clamp(26px, 8vw, 38px);
+      border-radius: 18px;
+      background: #ef8fb5;
+      box-shadow: 4px 4px 0 #4baecb;
+    }
+
+    .jump-btn span {
+      font-size: 10px;
+      margin-top: 3px;
+      letter-spacing: 1px;
+    }
+
+    .bottom {
+      margin-top: 8px;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .bottom button {
+      padding: 9px 16px;
+      font-size: 14px;
+    }
+
+    /* 메뉴도 세로 화면에 맞게 압축 */
+    .panel {
+      width: 100%;
+      padding: 14px 10px;
+      margin-bottom: 8px;
+    }
+
+    .panel h2 { font-size: 22px; }
+    .panel p { margin: 7px 0; font-size: 13px; }
+
+    .uploads {
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .file-label {
+      flex: 1;
+      min-width: 145px;
+      padding: 7px;
+      font-size: 12px;
+    }
+
+    input[type=file] {
+      width: 100%;
+      max-width: 100%;
+      font-size: 11px;
+    }
+
+    .difficulty-box {
+      margin: 10px 0;
+      padding: 9px 6px;
+    }
+
+    .difficulty-buttons {
+      gap: 5px;
+      margin: 7px 0;
+    }
+
+    .difficulty {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 4px;
+      font-size: 12px;
+    }
+
+    .modes {
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .modes button {
+      min-width: 0;
+      flex: 1;
+      padding: 12px 8px;
+      font-size: 15px;
+    }
+  }
+
+  /* 아주 좁은 세로형 스마트폰 */
+  @media (max-width: 380px) and (orientation: portrait) {
+    h1 { font-size: 22px; }
+    .help { font-size: 11px; }
+
+    .touch-btn {
+      width: 45px;
+      height: 52px;
+    }
+
+    .jump-btn {
+      width: 66px;
+      height: 60px;
+    }
+
+    .mobile-controls { gap: 4px; }
+    .mobile-player { padding-left: 2px; padding-right: 2px; }
+    .control-row { gap: 3px; }
+  }
+
+  /* 가로 모드에서는 게임 화면을 최대한 크게 */
+  @media (orientation: landscape) and (max-height: 650px) and (pointer: coarse) {
+    /* 가로 모드에서도 다시 시작/일시정지 버튼까지 접근 가능하게 */
+    body {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .wrap {
+      min-height: 100dvh;
+      height: auto;
+      padding: 4px 8px max(8px, env(safe-area-inset-bottom));
+      justify-content: flex-start;
+    }
+
+    h1, .help { display: none; }
+
+    canvas {
+      width: min(100vw, calc((100dvh - 135px) * 1.777));
+      max-width: 100vw;
+      height: auto;
+      max-height: none;
+      margin: 0 auto;
+    }
+
+    .mobile-controls {
+      width: min(100vw, calc((100dvh - 135px) * 1.777));
+      margin: 5px auto 0;
+    }
+
+    .mobile-player {
+      padding: 4px;
+    }
+
+    .mobile-label { display: none; }
+
+    .touch-btn {
+      width: 48px;
+      height: 46px;
+    }
+
+    .jump-btn {
+      width: 76px;
+      height: 54px;
+    }
+
+    .bottom {
+      display: flex;
+      width: min(100%, 520px);
+      margin: 6px auto 0;
+      gap: 7px;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .bottom button {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 10px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+  }
+
+  canvas {
+    width: 100%; height: auto; display: block;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    border: 6px solid #fff7fb;
+    border-radius: 8px;
+    image-rendering: pixelated;
+    box-shadow: 8px 8px 0 rgba(239,142,181,.38), -5px -5px 0 rgba(139,220,255,.32);
+    background: linear-gradient(#86d7f7 0%, #b7e9ff 55%, #ffc0d6 55%, #f59aba 100%);
+  }
+  .bottom {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* 시작 화면 설명 글자 가독성 강화 */
+  .panel h2,
+  .panel p,
+  .panel .hint,
+  .panel #difficultyHint {
+    color: #fff !important;
+  }
+
+  .file-label {
+    color: #fff;
+    font-weight: 800;
+  }
+
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>여름! 바다! 배구! 🏐</h1>
+  <p id="helpText" class="help">시원한 바닷가에서 캐릭터를 선택하고 게임을 시작하세요!</p>
+
+  <section id="menu" class="panel">
+    <h2>🌺 SUMMER VOLLEY 🌺</h2>
+    <p>레트로한 여름 바다에서 신나는 배구 한 판!</p>
+
+    <div class="uploads">
+      <label class="file-label">
+        🟠 1P 캐릭터 (선택사항)
+        <input type="file" id="player1File" accept="image/png,image/webp,image/jpeg">
+      </label>
+      <label class="file-label">
+        🔵 2P 캐릭터 (선택사항)
+        <input type="file" id="player2File" accept="image/png,image/webp,image/jpeg">
+      </label>
+    </div>
+
+    <div class="difficulty-box">
+      <strong>🤖 AI 난이도</strong>
+      <div class="difficulty-buttons">
+        <button type="button" class="difficulty selected" data-difficulty="easy">😊 쉬움</button>
+        <button type="button" class="difficulty" data-difficulty="normal">😎 보통</button>
+        <button type="button" class="difficulty" data-difficulty="hard">🔥 어려움</button>
+      </div>
+      <small id="difficultyHint">AI가 느리고 반응이 늦습니다.</small>
+    </div>
+
+    <div class="modes">
+      <button id="onePlayer">🤖 1인용<br><small>AI와 대결</small></button>
+      <button id="twoPlayer">👥 2인용<br><small>친구와 대결</small></button>
+    </div>
+
+    <div class="hint">
+      1P: A / D 이동 · W 점프<br>
+      2P: ← / → 이동 · ↑ 점프<br>
+      PNG는 투명 배경이면 가장 자연스럽습니다.
+    </div>
+  </section>
+
+  <canvas id="game" width="960" height="540"></canvas>
+
+  <div id="mobileControls" class="mobile-controls" aria-label="모바일 게임 조작 버튼">
+    <div class="mobile-player" id="mobileLeft">
+      <div class="mobile-label">🟠 1P</div>
+      <div class="control-row">
+        <button class="touch-btn" data-key="a">◀</button>
+        <button class="touch-btn jump-btn" data-key="w">▲<span>JUMP</span></button>
+        <button class="touch-btn" data-key="d">▶</button>
+      </div>
+    </div>
+
+    <div class="mobile-player" id="mobileRight">
+      <div class="mobile-label">🔵 2P</div>
+      <div class="control-row">
+        <button class="touch-btn" data-key="arrowleft">◀</button>
+        <button class="touch-btn jump-btn" data-key="arrowup">▲<span>JUMP</span></button>
+        <button class="touch-btn" data-key="arrowright">▶</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <button id="pauseBtn">⏸ 일시정지</button>
+    <button id="restart">🔄 게임 다시 시작</button>
+  </div>
+</main>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const W = canvas.width, H = canvas.height;
+const groundY = 455;
+const net = { x: W / 2 - 8, y: 300, w: 16, h: groundY - 300 };
+const keys = Object.create(null);
+
+const P = {
+  gravity: 0.48,
+  moveSpeed: 5.2,
+  jumpPower: -11.5,
+  ballGravity: 0.34,
+  winScore: 11
+};
+
+let gameMode = null;
+let aiDifficulty = "easy";
+
+// 난이도별 AI 설정
+const AI_LEVELS = {
+  easy: {
+    speed: 2.35,
+    reactionFrames: 20,
+    targetError: 65,
+    jumpChance: 0.38,
+    jumpDistance: 75
+  },
+  normal: {
+    speed: 3.35,
+    reactionFrames: 10,
+    targetError: 32,
+    jumpChance: 0.68,
+    jumpDistance: 95
+  },
+  hard: {
+    speed: 4.7,
+    reactionFrames: 3,
+    targetError: 10,
+    jumpChance: 0.92,
+    jumpDistance: 120
+  }
+};
+
+let aiBrain = {
+  timer: 0,
+  targetX: W * 0.75,
+  jumpCooldown: 0
+};
+
+let left = null;
+let right = null;
+let ball = null;
+let state = "menu";
+let message = "";
+let isPaused = false;
+let img1 = null;
+let img2 = null;
+
+addEventListener("keydown", e => {
+  keys[e.key.toLowerCase()] = true;
+  if (["ArrowLeft", "ArrowRight", "ArrowUp"].includes(e.key)) e.preventDefault();
+  if (e.key.toLowerCase() === "r" && gameMode) resetMatch();
+  if ((e.key === " " || e.key.toLowerCase() === "p") && gameMode) {
+    e.preventDefault();
+    document.getElementById("pauseBtn").click();
+  }
+});
+addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+
+// 모바일 터치 버튼: 누르는 동안 이동, 손을 떼면 정지
+document.querySelectorAll(".touch-btn").forEach(button => {
+  const key = button.dataset.key;
+
+  const press = (e) => {
+    e.preventDefault();
+    keys[key] = true;
+    if (button.setPointerCapture && e.pointerId !== undefined) {
+      try { button.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+  };
+
+  const release = (e) => {
+    e.preventDefault();
+    keys[key] = false;
+  };
+
+  button.addEventListener("pointerdown", press);
+  button.addEventListener("pointerup", release);
+  button.addEventListener("pointercancel", release);
+  button.addEventListener("pointerleave", release);
+});
+
+// 화면 밖에서 손가락을 떼었을 때 키가 계속 눌린 상태가 되는 것을 방지
+addEventListener("pointerup", () => {
+  ["a", "d", "w", "arrowleft", "arrowright", "arrowup"].forEach(k => {
+    keys[k] = false;
+  });
+});
+addEventListener("blur", () => {
+  Object.keys(keys).forEach(k => keys[k] = false);
+});
+
+function loadUploadedImage(file, side) {
+  if (!file) return;
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const image = new Image();
+    image.onload = () => {
+      if (side === "left") img1 = image;
+      else img2 = image;
+    };
+    image.src = reader.result;
+  };
+
+  reader.readAsDataURL(file);
+}
+
+document.getElementById("player1File").addEventListener("change", e => {
+  loadUploadedImage(e.target.files[0], "left");
+});
+document.getElementById("player2File").addEventListener("change", e => {
+  loadUploadedImage(e.target.files[0], "right");
+});
+
+// AI 난이도 선택
+const difficultyHints = {
+  easy: "AI가 느리고 반응이 늦습니다. 처음 플레이하기 좋아요!",
+  normal: "적당한 속도와 반응을 가진 AI입니다.",
+  hard: "AI가 빠르게 움직이고 공을 잘 따라갑니다!"
+};
+
+document.querySelectorAll(".difficulty").forEach(button => {
+  button.addEventListener("click", () => {
+    aiDifficulty = button.dataset.difficulty;
+    document.querySelectorAll(".difficulty").forEach(b => b.classList.remove("selected"));
+    button.classList.add("selected");
+    document.getElementById("difficultyHint").textContent = difficultyHints[aiDifficulty];
+  });
+});
+
+document.getElementById("onePlayer").onclick = () => startGame("one");
+document.getElementById("twoPlayer").onclick = () => startGame("two");
+document.getElementById("restart").onclick = () => {
+  if (gameMode) resetMatch();
+};
+
+document.getElementById("pauseBtn").onclick = () => {
+  if (!gameMode || !left || !right || !ball) return;
+
+  isPaused = !isPaused;
+  const button = document.getElementById("pauseBtn");
+
+  if (isPaused) {
+    button.textContent = "▶ 계속하기";
+    message = "⏸ 일시정지";
+  } else {
+    button.textContent = "⏸ 일시정지";
+    message = "";
+  }
+};
+
+function startGame(mode) {
+  gameMode = mode;
+  isPaused = false;
+  document.getElementById("pauseBtn").textContent = "⏸ 일시정지";
+  document.getElementById("menu").style.display = "none";
+
+  // 모바일에서는 1인용일 때 1P 조작 버튼만 표시
+  document.getElementById("mobileLeft").style.display = "block";
+  document.getElementById("mobileRight").style.display = mode === "two" ? "block" : "none";
+  const difficultyName = {
+    easy: "쉬움 😊",
+    normal: "보통 😎",
+    hard: "어려움 🔥"
+  };
+
+  document.getElementById("helpText").textContent =
+    mode === "one"
+      ? `1인용 · 난이도: ${difficultyName[aiDifficulty]} · A / D 이동 · W 점프`
+      : "2인용 · 왼쪽: A / D / W ｜ 오른쪽: ← / → / ↑";
+  resetMatch();
+}
+
+function makePlayer(side) {
+  return {
+    x: side === "left" ? 170 : W - 170,
+    y: groundY - 42,
+    vx: 0, vy: 0,
+    r: 42,
+    side,
+    score: 0,
+    color: side === "left" ? "#ff9f1c" : "#4dabf7"
+  };
+}
+
+function resetBall(servingSide) {
+  if (!servingSide) servingSide = Math.random() < 0.5 ? "left" : "right";
+  ball = {
+    x: servingSide === "left" ? W * 0.30 : W * 0.70,
+    y: 120,
+    vx: servingSide === "left" ? 3.5 : -3.5,
+    vy: -1,
+    r: 20
+  };
+}
+
+function resetMatch() {
+  isPaused = false;
+  document.getElementById("pauseBtn").textContent = "⏸ 일시정지";
+
+  aiBrain = {
+    timer: 0,
+    targetX: W * 0.75,
+    jumpCooldown: 0
+  };
+  left = makePlayer("left");
+  right = makePlayer("right");
+  resetBall();
+  state = "playing";
+  message = "";
+}
+
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
+}
+
+function updatePlayer(p) {
+  let dir = 0;
+
+  if (p.side === "right" && gameMode === "one") {
+    const level = AI_LEVELS[aiDifficulty];
+
+    // AI는 일정 프레임마다만 판단합니다.
+    // 쉬움일수록 공을 늦게 보고, 목표 위치도 부정확합니다.
+    aiBrain.timer--;
+    if (aiBrain.timer <= 0) {
+      aiBrain.timer = level.reactionFrames;
+
+      const randomError = (Math.random() - 0.5) * 2 * level.targetError;
+
+      // 공이 자기 코트로 오면 공 근처로, 아니면 중앙 근처로 돌아갑니다.
+      if (ball.x > W / 2 || ball.vx > 0) {
+        aiBrain.targetX = clamp(ball.x + randomError, W / 2 + p.r + 10, W - p.r);
+      } else {
+        aiBrain.targetX = W * 0.75 + randomError * 0.35;
+      }
+    }
+
+    const dx = aiBrain.targetX - p.x;
+    if (Math.abs(dx) > 16) dir = dx > 0 ? 1 : -1;
+
+    // 난이도에 따라 AI 이동 속도 제한
+    p.vx = dir * level.speed;
+
+    if (aiBrain.jumpCooldown > 0) aiBrain.jumpCooldown--;
+
+    const onGround = p.y + p.r >= groundY - 0.5;
+    const ballIsOnAISide = ball.x > W / 2 - 20;
+    const ballIsAbove = ball.y < p.y + 5;
+    const closeEnough = Math.abs(ball.x - p.x) < level.jumpDistance;
+
+    // 쉬움은 점프를 자주 실패하도록 확률을 둡니다.
+    if (onGround && aiBrain.jumpCooldown <= 0 &&
+        ballIsOnAISide && ballIsAbove && closeEnough && ball.vy > -5) {
+      if (Math.random() < level.jumpChance) {
+        p.vy = P.jumpPower;
+      }
+      aiBrain.jumpCooldown = 28;
+    }  } else if (p.side === "left") {
+    if (keys["a"]) dir -= 1;
+    if (keys["d"]) dir += 1;
+    if (keys["w"] && p.y + p.r >= groundY - 0.5) p.vy = P.jumpPower;
+  } else {
+    if (keys["arrowleft"]) dir -= 1;
+    if (keys["arrowright"]) dir += 1;
+    if (keys["arrowup"] && p.y + p.r >= groundY - 0.5) p.vy = P.jumpPower;
+  }
+
+  // AI는 난이도별 속도를 이미 설정합니다.
+  if (!(p.side === "right" && gameMode === "one")) {
+    p.vx = dir * P.moveSpeed;
+  }
+  p.x += p.vx;
+  p.vy += P.gravity;
+  p.y += p.vy;
+
+  const minX = p.side === "left" ? p.r : W / 2 + net.w / 2 + p.r;
+  const maxX = p.side === "left" ? W / 2 - net.w / 2 - p.r : W - p.r;
+  p.x = clamp(p.x, minX, maxX);
+
+  if (p.y + p.r > groundY) {
+    p.y = groundY - p.r;
+    p.vy = 0;
+  }
+}
+
+function collideBallPlayer(p) {
+  const dx = ball.x - p.x;
+  const dy = ball.y - p.y;
+  const dist = Math.hypot(dx, dy);
+  const minDist = ball.r + p.r;
+
+  if (dist < minDist) {
+    const nx = dist ? dx / dist : (p.side === "left" ? 1 : -1);
+    const ny = dist ? dy / dist : -1;
+    const overlap = minDist - dist;
+
+    ball.x += nx * overlap;
+    ball.y += ny * overlap;
+
+    const relative = ball.vx * nx + ball.vy * ny;
+    if (relative < 0) {
+      ball.vx -= 2.08 * relative * nx;
+      ball.vy -= 2.08 * relative * ny;
+    }
+
+    ball.vx += p.vx * 0.45 + nx * 0.8;
+    ball.vy += p.vy * 0.18 + ny * 0.5;
+  }
+}
+
+function scorePoint(winner) {
+  if (!winner) return; // 안전장치
+  winner.score++;
+
+  if (winner.score >= P.winScore) {
+    state = "gameover";
+    message = winner.side === "left" ? "왼쪽 플레이어 승리! 🎉" : "오른쪽 플레이어 승리! 🎉";
+    return;
+  }
+
+  message = winner.side === "left" ? "왼쪽 +1점!" : "오른쪽 +1점!";
+  resetBall(winner.side);
+  state = "point";
+
+  setTimeout(() => {
+    if (state === "point") {
+      state = "playing";
+      message = "";
+    }
+  }, 900);
+}
+
+function updateBall() {
+  ball.vy += P.ballGravity;
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  if (ball.x - ball.r < 0) {
+    ball.x = ball.r;
+    ball.vx *= -0.95;
+  }
+  if (ball.x + ball.r > W) {
+    ball.x = W - ball.r;
+    ball.vx *= -0.95;
+  }
+  if (ball.y - ball.r < 0) {
+    ball.y = ball.r;
+    ball.vy *= -0.95;
+  }
+
+  if (
+    ball.x + ball.r > net.x &&
+    ball.x - ball.r < net.x + net.w &&
+    ball.y + ball.r > net.y &&
+    ball.y - ball.r < groundY
+  ) {
+    if (ball.y < net.y + 12) {
+      ball.y = net.y - ball.r;
+      ball.vy = -Math.abs(ball.vy) * 0.9;
+    } else {
+      ball.x = ball.x < W / 2 ? net.x - ball.r : net.x + net.w + ball.r;
+      ball.vx *= -0.9;
+    }
+  }
+
+  collideBallPlayer(left);
+  collideBallPlayer(right);
+
+  if (ball.y + ball.r >= groundY) {
+    scorePoint(ball.x < W / 2 ? right : left);
+  }
+}
+
+function drawFallbackPlayer(p) {
+  ctx.fillStyle = p.color;
+  ctx.beginPath();
+  ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#172033";
+  ctx.beginPath();
+  ctx.arc(-14, -6, 5, 0, Math.PI * 2);
+  ctx.arc(14, -6, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#172033";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(0, 7, 13, 0.1, Math.PI - 0.1);
+  ctx.stroke();
+}
+
+function drawPlayer(p) {
+  const image = p.side === "left" ? img1 : img2;
+
+  ctx.save();
+  ctx.translate(p.x, p.y);
+
+  if (image && image.complete && image.naturalWidth > 0) {
+    const size = p.r * 2.5;
+    ctx.drawImage(image, -size / 2, -size / 2, size, size);
+  } else {
+    drawFallbackPlayer(p);
+  }
+
+  ctx.restore();
+}
+
+function drawBall() {
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#cbd5e1";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+function pixelRect(x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+}
+
+function drawCloud(x, y, scale) {
+  pixelRect(x, y, 32 * scale, 12 * scale, "#f9fbff");
+  pixelRect(x + 8 * scale, y - 8 * scale, 24 * scale, 28 * scale, "#f9fbff");
+  pixelRect(x + 32 * scale, y - 4 * scale, 24 * scale, 24 * scale, "#f9fbff");
+  pixelRect(x + 52 * scale, y + 4 * scale, 18 * scale, 12 * scale, "#f9fbff");
+  pixelRect(x + 8 * scale, y + 16 * scale, 48 * scale, 8 * scale, "rgba(255,255,255,.65)");
+}
+
+function drawPalm(x, baseY, scale) {
+  // 줄기
+  pixelRect(x, baseY - 70 * scale, 10 * scale, 70 * scale, "#c98565");
+  pixelRect(x + 4 * scale, baseY - 70 * scale, 8 * scale, 70 * scale, "#efb48d");
+
+  // 야자 잎 - 도트 블록 느낌
+  const leaf = "#5cc9c8";
+  const leaf2 = "#ff9fbd";
+  pixelRect(x - 35 * scale, baseY - 88 * scale, 42 * scale, 10 * scale, leaf);
+  pixelRect(x - 22 * scale, baseY - 105 * scale, 30 * scale, 10 * scale, leaf);
+  pixelRect(x + 8 * scale, baseY - 102 * scale, 36 * scale, 10 * scale, leaf2);
+  pixelRect(x + 8 * scale, baseY - 83 * scale, 48 * scale, 10 * scale, leaf);
+  pixelRect(x - 15 * scale, baseY - 75 * scale, 30 * scale, 10 * scale, leaf2);
+}
+
+function drawScene() {
+  ctx.clearRect(0, 0, W, H);
+
+  // 픽셀 하늘 그라데이션: 큰 띠로 표현해서 레트로 느낌 강화
+  const skyBands = [
+    ["#78cbed", 0, 70],
+    ["#8fd8f5", 70, 70],
+    ["#a7e3f8", 140, 70],
+    ["#c0ebf7", 210, 65]
+  ];
+  skyBands.forEach(([color, y, h]) => pixelRect(0, y, W, h, color));
+
+  // 도트 구름
+  drawCloud(75, 105, 1.15);
+  drawCloud(720, 78, 0.95);
+  drawCloud(835, 165, 1.1);
+
+  // 픽셀 태양
+  pixelRect(835, 55, 34, 34, "#ffd2df");
+  pixelRect(842, 48, 20, 48, "#ffd2df");
+  pixelRect(828, 62, 48, 20, "#ffd2df");
+  pixelRect(842, 55, 20, 34, "#fff2a8");
+
+  // 수평선과 바다
+  pixelRect(0, 285, W, 18, "#ffb0ca");
+  pixelRect(0, 303, W, 112, "#63c9e4");
+  pixelRect(0, 320, W, 10, "#9ce8f5");
+  pixelRect(40, 350, 110, 7, "#a9edf5");
+  pixelRect(260, 330, 130, 7, "#a9edf5");
+  pixelRect(610, 365, 160, 7, "#a9edf5");
+  pixelRect(800, 325, 100, 7, "#a9edf5");
+  pixelRect(500, 395, 220, 8, "#45b6d7");
+
+  // 모래사장 - 분홍빛
+  pixelRect(0, 415, W, H - 415, "#ffb6cf");
+  pixelRect(0, 438, W, H - 438, "#f79bbb");
+  pixelRect(0, 415, W, 7, "#ffe2ed");
+
+  // 모래 도트
+  for (let x = 15; x < W; x += 53) {
+    const y = 430 + ((x * 7) % 75);
+    pixelRect(x, y, 9, 5, "#ffdaea");
+    pixelRect(x + 17, y + 20, 6, 4, "#e77da7");
+  }
+
+  // 양쪽 야자수
+  drawPalm(70, 420, 1);
+  drawPalm(870, 420, 0.9);
+
+  // 중앙 점선
+  ctx.strokeStyle = "rgba(255,255,255,.35)";
+  ctx.lineWidth = 3;
+  ctx.setLineDash([10, 10]);
+  ctx.beginPath();
+  ctx.moveTo(W / 2, 0);
+  ctx.lineTo(W / 2, net.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 레트로 핑크/하늘색 네트
+  pixelRect(net.x - 2, net.y - 5, net.w + 4, 6, "#fff4fa");
+  pixelRect(net.x, net.y, net.w, net.h, "#5b7590");
+  for (let y = net.y + 8; y < groundY; y += 12) {
+    pixelRect(net.x, y, net.w, 3, "#ffd0df");
+  }
+}
+function drawGame() {
+  drawScene();
+
+  // 메뉴 상태에서는 left/right가 없으므로 점수와 캐릭터를 그리지 않습니다.
+  if (!left || !right || !ball) return;
+
+  ctx.textAlign = "center";
+  ctx.font = "bold 42px monospace";
+  ctx.fillStyle = "#f48fb1";
+  ctx.fillText(`${left.score} : ${right.score}`, W/2 + 3, 63);
+  ctx.fillStyle = "#fff8fc";
+  ctx.fillText(`${left.score} : ${right.score}`, W/2, 60);
+
+  drawPlayer(left);
+  drawPlayer(right);
+  drawBall();
+
+  if (message) {
+    ctx.fillStyle = "rgba(0,0,0,.6)";
+    ctx.fillRect(W/2 - 180, 85, 360, 58);
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 26px system-ui";
+    ctx.fillText(message, W/2, 123);
+  }
+
+  if (isPaused) {
+    ctx.fillStyle = "rgba(28, 83, 110, .58)";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 42px system-ui";
+    ctx.textAlign = "center";
+    ctx.fillText("⏸ 일시정지", W / 2, H / 2 - 12);
+
+    ctx.fillStyle = "#f7b0c9";
+    ctx.font = "bold 18px system-ui";
+    ctx.fillText("계속하기 버튼을 눌러 게임을 재개하세요", W / 2, H / 2 + 28);
+  }
+
+  if (state === "gameover") {
+    ctx.fillStyle = "rgba(0,0,0,.55)";
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 42px system-ui";
+    ctx.fillText(message, W/2, H/2);
+  }
+}
+
+function loop() {
+  if (state === "playing" && !isPaused && left && right && ball) {
+    updatePlayer(left);
+    updatePlayer(right);
+    updateBall();
+  }
+  drawGame();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
